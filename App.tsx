@@ -1,21 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
+import 'react-native-gesture-handler';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+	useFonts,
+	Raleway_300Light,
+	Raleway_400Regular,
+	Raleway_500Medium,
+} from '@expo-google-fonts/raleway';
+import AppLoading from 'expo-app-loading';
+
+import { Rotas } from './src/routes/index.routes';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+	let [fontsLoaded] = useFonts({
+		Raleway_300Light,
+		Raleway_400Regular,
+		Raleway_500Medium,
+	});
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+	if (!fontsLoaded) return <AppLoading />;
+
+	return <Rotas />;
+}
