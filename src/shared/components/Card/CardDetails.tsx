@@ -1,13 +1,13 @@
 import React from 'react';
-import { StyleSheet, Text, Image } from 'react-native';
-import { RectButton, RectButtonProps } from 'react-native-gesture-handler';
+import { StyleSheet, Text, Image, View } from 'react-native';
 import colors from '../../../../styles/colors';
 import fonts from '../../../../styles/fonts';
 import { randomColor } from '../../utils/utils';
 
-interface CardProps extends RectButtonProps {
+interface CardProps {
 	data: {
-		name: string;
+		id: string;
+		title: string;
 		thumbnail: {
 			extension: string;
 			path: string;
@@ -15,23 +15,24 @@ interface CardProps extends RectButtonProps {
 	};
 }
 
-export const CardHeroSecundary = ({
-	data: { name, thumbnail },
+export const CardDetails = ({
+	data: { id, title, thumbnail },
 	...rest
 }: CardProps) => (
-	<RectButton style={styles.container} {...rest}>
+	<View key={id} style={styles.container} {...rest}>
 		<Image
 			source={{ uri: `${thumbnail.path}.${thumbnail.extension}` }}
 			style={styles.image}
 		/>
-		<Text style={styles.textName}>{name}</Text>
-	</RectButton>
+		<Text style={styles.textName}>{title}</Text>
+	</View>
 );
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		maxWidth: '50%',
+		width: 200,
+		height: 200,
 		backgroundColor: colors.gray_light,
 		paddingVertical: 10,
 		alignItems: 'center',

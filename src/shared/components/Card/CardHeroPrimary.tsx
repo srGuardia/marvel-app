@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, Image, View } from 'react-native';
+import { StyleSheet, Text, Image } from 'react-native';
 import { RectButton, RectButtonProps } from 'react-native-gesture-handler';
 import colors from '../../../../styles/colors';
 import fonts from '../../../../styles/fonts';
+import { randomColor } from '../../utils/utils';
 
 interface CardProps extends RectButtonProps {
 	data: {
@@ -21,7 +22,7 @@ export const CardHeroPrimary = ({
 	<RectButton style={styles.container} {...rest}>
 		<Image
 			source={{ uri: `${thumbnail.path}.${thumbnail.extension}` }}
-			style={{ width: 100, height: 100 }}
+			style={styles.image}
 		/>
 		<Text style={styles.textName}>{name}</Text>
 	</RectButton>
@@ -35,11 +36,20 @@ const styles = StyleSheet.create({
 		paddingVertical: 10,
 		alignItems: 'center',
 		margin: 10,
+		borderRadius: 10,
 	},
 	textName: {
 		marginTop: 10,
 		fontFamily: fonts.heading,
 		color: colors.black,
 		fontSize: 12,
+		textAlign: 'center',
+	},
+	image: {
+		width: 100,
+		height: 100,
+		borderRadius: 50,
+		borderColor: randomColor(),
+		borderWidth: 3,
 	},
 });

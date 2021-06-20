@@ -1,22 +1,22 @@
-import React, { FC } from 'react';
-import { useCallback } from 'react';
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { View } from 'react-native';
+import React, { FC, useState, useCallback, useEffect } from 'react';
+import { View, Alert } from 'react-native';
 import {
 	SafeAreaView,
-	Text,
 	FlatList,
 	StyleSheet,
 	Platform,
-	
+	Modal,
+	TextInput,
+	KeyboardAvoidingView,
 } from 'react-native';
+
 import colors from '../../../../styles/colors';
 import Hero from '../../../interface/hero';
-
 import marvelApi from '../../../services/marvelApi';
 import { CardHeroPrimary } from '../../../shared/components/Card/CardHeroPrimary';
 import { Load } from '../../../shared/components/Load';
+import { setHeroFavorite } from '../../../shared/utils/utils';
+import { HeroDetailContainer } from '../HeroDetail';
 
 export const ListHeroesContainer: FC = () => {
 	const [heroes, setHeroes] = useState<Hero[]>([]);
@@ -24,6 +24,10 @@ export const ListHeroesContainer: FC = () => {
 	const [total, setTotal] = useState(0);
 	let [offset, setOffset] = useState(0);
 	const limit: number = 10;
+	let [visible, setVisible] = useState(false);
+	let [selectedHero, setSelectedHero] = useState({} as Hero);
+	const [herosFilter, setHerosFilter] = useState<Hero[] | null>(null);
+	let [nameHero, setNameHero] = useState('');
 
 	useEffect(() => {
 		async function loadHeroes() {
@@ -58,17 +62,54 @@ export const ListHeroesContainer: FC = () => {
 		[heroes]
 	);
 
+	const handleFavoriteHero = useCallback(async (hero: Hero) => {
+		Alert.alert('Herói', 'Adicionado aos favoritos!', [{ text: 'OK' }]);
+
+		await setHeroFavorite(hero);
+	}, []);
+
+	const handleModal = useCallback((hero: Hero) => {
+		setSelectedHero(hero);
+		setVisible(!visible);
+	}, []);
+
+	const handleInputChange = useCallback((name: string) => {
+		setNameHero(name);
+	}, []);
+
+	const handleSearchHero = useCallback(async () => {
+		if (nameHero === '') setHerosFilter(null);
+		else {
+			setLoading(true);
+			const { data } = await marvelApi.heroName(nameHero);
+
+			setHerosFilter(data.results);
+			setLoading(false);
+		}
+	}, [nameHero]);
+
 	if (loading) return <Load />;
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.listHeroes}>
-				{heroes && (
+			<KeyboardAvoidingView
+				style={styles.container}
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			>
+				<View style={styles.listHeroes}>
+					<TextInput
+						placeholder='Busque seu herói'
+						value={nameHero}
+						style={styles.inputText}
+						onChangeText={handleInputChange}
+						onBlur={handleSearchHero}
+					/>
+
 					<FlatList
-						data={heroes}
+						data={!herosFilter ? heroes : herosFilter}
 						keyExtractor={(item) => String(item.id)}
 						renderItem={({ item }) => (
-							<CardHeroPrimary data={item} onPress={() => {}} />
+							<CardHeroPrimary data={item} onPress={() => handleModal(item)} />
 						)}
 						showsVerticalScrollIndicator={false}
 						numColumns={2}
@@ -77,8 +118,16 @@ export const ListHeroesContainer: FC = () => {
 							handleFetchMore(distanceFromEnd)
 						}
 					/>
-				)}
-			</View>
+				</View>
+			</KeyboardAvoidingView>
+
+			<Modal animationType='slide' visible={visible}>
+				<HeroDetailContainer
+					selectedHero={selectedHero}
+					handleVisible={() => setVisible(!visible)}
+					handleFavoriteHero={() => handleFavoriteHero(selectedHero)}
+				/>
+			</Modal>
 		</SafeAreaView>
 	);
 };
@@ -86,6 +135,7 @@ export const ListHeroesContainer: FC = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		width: '100%',
 		backgroundColor: colors.gray,
 		paddingVertical: Platform.OS === 'android' ? 30 : 0,
 	},
@@ -93,5 +143,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingHorizontal: 32,
 		justifyContent: 'center',
+	},
+	inputText: {
+		borderBottomWidth: 1,
+		borderColor: colors.red,
+		color: colors.black,
+		backgroundColor: colors.white,
+		fontSize: 14,
+		padding: 10,
+		textAlign: 'center',
 	},
 });

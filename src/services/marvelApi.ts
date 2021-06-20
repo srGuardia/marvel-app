@@ -34,11 +34,55 @@ class MarvelApi {
 			}/characters?orderBy=name&limit=${vLimit}&offset=${offset}&${generateApiKey()}`
 		);
 
-		const obj = {
-			data: data,
+		return {
+			data,
 		};
+	}
 
-		return obj;
+	async getHero(idHero: number): Promise<MarvelData> {
+		const {
+			data: { data },
+		} = await axios.get(
+			`${this.baseURL}/characters/${idHero}?${generateApiKey()}`
+		);
+
+		return {
+			data,
+		};
+	}
+
+	async heroName(name: string): Promise<MarvelData> {
+		const {
+			data: { data },
+		} = await axios.get(
+			`${this.baseURL}/characters?nameStartsWith=${name}&${generateApiKey()}`
+		);
+
+		return { data };
+	}
+
+	async getComics(idHero: number) {
+		const {
+			data: {
+				data: { results },
+			},
+		} = await axios.get(
+			`${this.baseURL}/characters/${idHero}/comics?${generateApiKey()}`
+		);
+
+		return { results };
+	}
+
+	async getSeries(idHero: number) {
+		const {
+			data: {
+				data: { results },
+			},
+		} = await axios.get(
+			`${this.baseURL}/characters/${idHero}/series?${generateApiKey()}`
+		);
+
+		return { results };
 	}
 }
 

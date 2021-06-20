@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import LottieView from 'lottie-react-native';
 
 import load from '../../../assets/loading.json';
+import colors from '../../../../styles/colors';
 
 export const Load: FC = () => (
 	<SafeAreaView style={styles.container}>
@@ -15,9 +16,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
+		backgroundColor: colors.red,
 	},
 	animation: {
-		backgroundColor: 'transparent',
 		width: 200,
 		height: 200,
 	},
